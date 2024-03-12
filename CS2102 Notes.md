@@ -91,3 +91,8 @@ Notice how objects are created from the Multiplier class using  ``Multiplier mul
     * @param candies the amount of candies
     * @return the total cost at $.50 per candy
     */
+
+## Lecture 2
+- *Trinary conditional* or *Elvis Operator* is ?:
+  - ``Boolean Expression ? True-Expression : False-Expression``
+  - When the boolean expression is true, evaluate the true expressions, otherwise evaluate the false expression
