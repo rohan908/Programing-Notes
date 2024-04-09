@@ -459,3 +459,181 @@ Method calling in OOP
   - **W.E.T**: Write Everything Twice
     - Only consider a common superclass when you *encounter* redundancy
     - Don't abstract too early
+## Lecture 12
+##### Real Time Processing
+- "Eager" computation
+- Data is processed as it is recieved
+  - Cleaning/parsing is done on data input
+- Pros: 
+  - Data becomes available for reuse immediately
+  - Query output is fast
+- Cons:
+  - If data is never needed, can waste computation
+  - If lots of data is inputted, data input can be slow
+
+##### Batch Processing
+- "lazy" computation
+- Data is processed as it is queried
+  - Cleaning/parsing is done just before query output
+- Pros:
+  - if cleaning/parsing is expensive, can be done only as needed
+  - Data input is fast since it is simple storage
+- Cons:
+  - Can store uncleaned data for a long time before processing
+  - Query output can be slow
+
+## Lecture 13
+##### Template Method Pattern
+- Simplified Def:
+  - Treat an object like an assembly line (in -> out)
+  - Make a super class (parent class) to hold all the steps
+  - Make each step into a method
+    - If a step has a default implementation give it one
+    - If a step depends on a subclass then make it abstract
+  - When you have a variation:
+    - Extend the super class
+    - Implement/override the steps for the variation
+    - Inherit the methods that do not change
+- What is it good for?
+  - Variations in behavior with major data/method redundancy
+- Useful tips
+  - Use fields to store data between "steps" in the assembly line
+  - Have the methods communicate via fields rather than call each other
+- Pros:
+  - Can reuse redundant methods while still having variations in behavior
+  - SUbclasses are often simple and client simply specfies which subclasses they want
+- Cons:
+  - Must know all the major "steps" before hand
+  - Storing data betwene steps can lead to redundant data storage
+  - Once a variation is picked you can't swap without constructing a new object
+  
+## Lecture 14
+##### Encapsulation
+- Prevents unwanted access or mutation to one or more fields
+- Public vs Private
+  - Public:
+    - Anyone can access/use this field or method
+  - Private:
+    - Only the enclosing scope (usually a class) can access this field or method
+- NOT JUST GETTER AND SETTER METHODS
+  - Reality of that is it is no different than public
+- What to do instead?
+  - Think about how yoiu want other classes to acess data
+  - Do you care if they mess the data up when initalized
+    - Can they even mess it up?
+  - Do you care if they mutate the data?
+    - Will mulitple pieces of code share the object?
+  - Do you care if they have acces to the whole data?
+    - And not jsut the queries?
+- Use cases for encapsulation
+  - Invariants (properites of the field that must always be true)
+    - Make field private and define a getter
+    - The setter will restrict and  enforce specific properties about changing the field
+      - ie the field must be > 0
+  - Immutability (Once the field is intialized, it should not change)
+    - Make a field private, initialize it in constructor only
+    - Make a getter, but no setter methods
+  - Data hiding (client doesn'pt care about field types/structures)
+    - Make field private
+    - no getters or setters
+    - Only accesible via the class's methods
+    - Datatype/data structure can be changed later
+    - Excpetion:
+      - Sharing wiht subclasses, make fields "protected"
+- Clone and Copy Constructors
+  - Problem: What if your data, itself, is mutable?
+    - Ex: ``private Linked<Double> SomeList;``
+  - Object class has a ``clone()`` method
+    - Don't use this it has issues
+  - Copy Constructor Solution
+    - Make a constructor that takes in an object with same type as current class and have it copy the data:
+      - Ex use: ``this.someList = new LinkedList<>(someList);`` 
+      - Ex def: ``public SomeClass(SomeClass objectToCopy){}``
+
+## Lecture 15
+Recall: Linked lists are stringed together, "one to one"
+##### Binary Trees
+- A 1-to-2 relationship between elements in a collection
+- Each parent node can have 2 children node with the trees ending in "leaf" nodes
+![alt text](image-10.png)
+
+##### Binary Search Trees
+- Same as binary trees but have an invariant so they can be used for searching
+- Takes about n steps to search 
+- Invariants:
+  - Leaves are all valid BSTs
+  - All data in the left subtrees < current data
+  - Current data < all data in right subtrees
+  - Left and right subtrees are valid BSTs
+  - Like BSTs because you can roughly throw away half the data to search when looking for something
+![alt text](image-11.png)
+
+##### AVL Trees (Balanced Binary Search Trees)
+- A binary tree + an invariant
+- Invariants:
+  - For each node: |left.height - right.height| <= 1
+    - Height = max # nodes between this node and a leaf\
+- Takes about log_2(n) amount of steps to search
+- EX: Left is an AVL right is not
+  - Red dictates the difference between the nodes children 
+  ![alt text](image-12.png)
+
+##### Min & Max Binary Heaps
+- A binary tree + an invariant
+- Invariants:
+  - Leaves are valid Min/Max Heaps by default
+  - Min: the current data is smaller than all the nodes below it
+  - Max: the current data is bigger than all the nodes below it
+  - Left and right subtreses are valid min/max heaps
+  ![alt text](image-13.png)
+
+  ## Lecture 16
+  ##### Working around Null Values
+  **Def: Null**
+  - Any object that 'does not exist'/hasn't been characterized
+  - Error is called a ``NullPointerException``
+- We want to check if a type is null with one class method regardless of the possible type it can have
+  - Solution: Use generics!!
+
+Say we have a class, Maybe that checks if an object is null.
+- Generics <*generic variable name*> 
+- Don't want to use objects bc then that could lead to runtime errors if they made a mistake
+  - The client would also need to downcast
+</ul>
+
+    public class Maybe<E>{
+      private E data;
+
+      public Maybe(E data){this.data = data;}
+
+      public Maybe(){
+        this.data = null;
+      }
+
+      public boolean hasData(){
+        return this.data != null;
+      }
+
+      pubilc E getData(){
+        return this.data;
+      }
+
+    }
+
+##### Optional in built java class
+- Java already has a class like maybe! It's called ``Optional<T>``
+  - ``Optional.of(...)`` makes wrapped values
+  - ``Optional.empty()`` makes empty ones
+- You can not accidently call an element's method on the wrapped optional
+</ul>
+
+    Optional<String> optS = Optional.of("hello");
+    optS.substring(0,4); //COMPILE TIME ERROR
+    optS.orElse("default answer").substring(0,4); //No error!!
+
+##### Constrainig Generics
+- Generics can also be constrained by interfaces
+- Useful if the data structer needs to call particular methods on the data
+  - But does not otherwise care what type the data is
+  - But the client will care and does no want to lose information to a super type
+- Uses the ``extends`` keyword instead of ``implements``? Idk why it just does
