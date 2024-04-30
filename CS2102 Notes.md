@@ -624,6 +624,8 @@ Say we have a class, Maybe that checks if an object is null.
 - Java already has a class like maybe! It's called ``Optional<T>``
   - ``Optional.of(...)`` makes wrapped values
   - ``Optional.empty()`` makes empty ones
+  - ``Optional.get()`` pulls the object out of the Optional
+    - Can be used after checking ``item.isPresent()``
 - You can not accidently call an element's method on the wrapped optional
 </ul>
 
@@ -631,9 +633,158 @@ Say we have a class, Maybe that checks if an object is null.
     optS.substring(0,4); //COMPILE TIME ERROR
     optS.orElse("default answer").substring(0,4); //No error!!
 
+
 ##### Constrainig Generics
 - Generics can also be constrained by interfaces
 - Useful if the data structer needs to call particular methods on the data
   - But does not otherwise care what type the data is
   - But the client will care and does no want to lose information to a super type
 - Uses the ``extends`` keyword instead of ``implements``? Idk why it just does
+
+## Lecture 18
+##### Runtime Analysis
+Two types:
+1) Profiling
+   - Occurs dynamically at runtime
+   - Test programs on particular input
+2) Asymptotic Analysis
+   - Occurs static at commpile-time (aka BigO Analysis) 
+   - Compare algorithms as data gets reeeeallly big
+
+You can profile your program using ``System.nanoTime()`` 
+
+Algorithmic Anlaysis:
+Different cases:
+- Big O
+  - Worst case
+- Big Omega
+  - Best Case
+- Big Theta
+  - Average case
+
+For big O calculations assume n->infinity. Therefore, only use leading terms and don't care about coefficients (like calculating the horizontal asymptote of a limit). Smaller is better!
+![alt text](image.png)
+
+Some general BIG O analysis:
+- Constant number of operations no matter the data: O(1)
+- For each data piece:
+  - Do a constant number of operations -> O(n)
+  - Loop over the data again -> O(n^2)
+  - Skiped a fixed % (like 1/2) of the data like a binary search -> O(log(n))
+- Sequential steps compose addivetly
+  - Loop over the data 3 times in a row -> Still O(n)
+- Nested Steps compose multiplicatively
+  - For each piece of data, do a binary search -> O(n * log(n))
+
+Linked List vs ArrayList Analysis:
+![alt text](image-1.png)
+
+## Lecture 19
+##### Map<K,V>, HashMaps, TreeMaps
+
+Maps: https://docs.oracle.com/javase/8/docs/api/java/util/Map.html
+HashMaps: https://docs.oracle.com/javase/8/docs/api/java/util/HashMap.html
+Tree Maps: https://docs.oracle.com/javase/8/docs/api/java/util/TreeMap.html 
+
+## Lecture 20
+##### Hashing and HashMaps
+
+Def: Hashing
+- The act of reducing a large amount of data into a number
+
+In Java: 
+- The act of converting an object to an int
+- Object's hashCode() method will return the hashcode (int) of  the object
+- hashCode() uses memory adddress by default but it can be overwritten 
+- If obj1 == obj2, then obj1.hashCode() == obj2.hashCode()
+
+HashMap<K,V>
+- Essentially an ArrayList<LinkedList<Pair<K,V>>>
+- Uses the key.hashCode() to find the Bucket the pair should go into
+- ```Get(key)```:
+  - SEarches the bucket for the key using .equals()
+  - returns the value if it is found, null otherwise
+- ```Put(key, value)```: 
+  - Searches the bucket for the key .equals()
+  - Returns the previous value associated with the key if one exists
+  - Mutates the apir to store the new value
+  - Makes a new pair and reutrns null if the key is not in the bucket
+- If hashcode() is larger than the size of the hashmap, then it uses modulo to loop back over the buckets with the remainder
+![alt text](image-2.png)
+
+Overriding hashcode():
+- When you overwrite equals but not hashcode() a bug may occur:
+  - k1.equals(k2) = true;
+  - k1.hashCode() != k2.hashCode()
+- Ex:
+  - Imagine we do ```someMap.put(k1, 3)```
+  - Since k1 and k2 are equal under .equals(), we might want to lookup 3 using k2
+    - ```someMap.get(k2)```
+  - Problem!
+    - .get() will look in a different bucket than k1 got assigned to and we won't find the value 3 :(
+
+Another Ex:
+- Notice that hashCode mutliplies shit by prime numbers to ensure uniqueness (want to avoid collisions)
+- By avoiding collisions we keep the HashMap having a uniform distribution instead of a normal distribution of values to keys
+  - uniform distribution means ```.get(k)``` and ```.put(k,v)``` are O(1)
+![alt text](image-3.png)
+
+
+You want to avoid collisions
+- A collision is when 2+ keys have the same hashCode()
+- So, they get put in the same bucket
+  - LoadFactor
+    - If the ratio of <K,V> pairs to # of buckets is < a constant threshold and the hashCode() is uniformly random then get() and put() are O(1)
+    - The ratio Java picks is 75%
+- If the # of <K,V> pairs exceeds 75% the # of buckets
+  - Java grows the ArrayList and reshuffles all of the pairs
+- If a particular bucket gets too full
+  - Java swaps it from a LinkedList to a Binary Search Tree
+
+## Lecture 21
+##### Using Exceptions
+- Exceptions are defined as classes and used as objects
+- Exceptions signal **unexepected** or **unintended** error
+- 2 Types:
+  - Unchecked "Runtime" Exceptions (default)
+  - Checked Exceptions  (custom)
+
+Runtime Exceptions:
+- An unchecked "runtime" exception does not prevent you from writing unsafe code
+- Alerts you when things go wrong at runtime
+- Ex:
+  - ArrayIndexOutOfBoundsException
+  - StackOverflowException
+  - NullPointerException
+- Making your own:
+  - ```public class ... Extends RuntimeException {...}```
+  - Use it with the ```throw`` keyword
+    - ```if(somethingBadHappened()){throw new RuntimeException();}```
+
+Checked Exceptions:
+- A checked exception can be made to signal failure that the client **must** handle:
+  - ```public class MyException extends Exception{...}```
+- The code that failes uses **throw** just like with Runtime exceptions:
+  - ```if(somethingBadHappened()){throw new MyException();}```
+- The method that **contains** the call to **thow** must secify that something can go wrong in its type signature
+  - ```public void myUnsafeMethod() throw MyException(){...}```
+- When the client calls the method it must use a try catch method
+
+</ul>
+
+    try{
+      myUnsafeMethod();
+      }
+    catch(myException e)
+    {...}
+
+Ex:
+![alt text](image-4.png)
+
+Some other notes about exceptions:
+- A method can throw multiple exceptions:
+  - ```public void myMethod() throw exception1, exception2 {...}```
+- A try block can have multiple catches
+  - ```try{...} catch(exception1 e1){...} catch (exception2 e2){...}```
+- Parent classes of Exception handle all subclasses
+  - So catch Exception e will also catch Exception1 e1 and Excpetion2 e2
