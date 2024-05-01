@@ -663,7 +663,7 @@ Different cases:
   - Average case
 
 For big O calculations assume n->infinity. Therefore, only use leading terms and don't care about coefficients (like calculating the horizontal asymptote of a limit). Smaller is better!
-![alt text](image.png)
+![alt text](image-14.png)
 
 Some general BIG O analysis:
 - Constant number of operations no matter the data: O(1)
@@ -677,7 +677,7 @@ Some general BIG O analysis:
   - For each piece of data, do a binary search -> O(n * log(n))
 
 Linked List vs ArrayList Analysis:
-![alt text](image-1.png)
+![alt text](image-15.png)
 
 ## Lecture 19
 ##### Map<K,V>, HashMaps, TreeMaps
@@ -710,7 +710,7 @@ HashMap<K,V>
   - Mutates the apir to store the new value
   - Makes a new pair and reutrns null if the key is not in the bucket
 - If hashcode() is larger than the size of the hashmap, then it uses modulo to loop back over the buckets with the remainder
-![alt text](image-2.png)
+![alt text](image-16.png)
 
 Overriding hashcode():
 - When you overwrite equals but not hashcode() a bug may occur:
@@ -727,7 +727,7 @@ Another Ex:
 - Notice that hashCode mutliplies shit by prime numbers to ensure uniqueness (want to avoid collisions)
 - By avoiding collisions we keep the HashMap having a uniform distribution instead of a normal distribution of values to keys
   - uniform distribution means ```.get(k)``` and ```.put(k,v)``` are O(1)
-![alt text](image-3.png)
+![alt text](image-17.png)
 
 
 You want to avoid collisions
@@ -779,7 +779,7 @@ Checked Exceptions:
     {...}
 
 Ex:
-![alt text](image-4.png)
+![alt text](image-18.png)
 
 Some other notes about exceptions:
 - A method can throw multiple exceptions:
