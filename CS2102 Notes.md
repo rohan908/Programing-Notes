@@ -758,7 +758,7 @@ Runtime Exceptions:
   - NullPointerException
 - Making your own:
   - ```public class ... Extends RuntimeException {...}```
-  - Use it with the ```throw`` keyword
+  - Use it with the ```throw``` keyword
     - ```if(somethingBadHappened()){throw new RuntimeException();}```
 
 Checked Exceptions:
